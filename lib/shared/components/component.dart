@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 Widget defaultButton({
   double width = double.infinity,
@@ -19,6 +21,7 @@ Widget defaultButton({
             color: background, borderRadius: BorderRadius.circular(10.0)),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
           children: [
             if (is_image)
               Image.asset(
@@ -30,11 +33,18 @@ Widget defaultButton({
                   ? EdgeInsets.only(left: 30.0, right: 50)
                   : EdgeInsets.all(0),
               child: MaterialButton(
+                height: 50.0,
+                minWidth: 40,
                 onPressed: function,
-                child: Text(
-                  isUpperCase ? text.toUpperCase() : text,
-                  style:
-                      TextStyle(color: TextColor, fontWeight: FontWeight.bold),
+                child: Container(
+                  width: !is_image?320:null,
+
+                  child: Text(
+                    textAlign: TextAlign.center,
+                    isUpperCase ? text.toUpperCase() : text,
+                    style:
+                        TextStyle(color: TextColor, fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
             ),
@@ -48,6 +58,7 @@ Widget dfaultFormField(
         String? Function(String?)? validator,
         required String label,
         required Widget? prefix,
+        TextStyle? textStyle,
         bool ispassword = false,
         IconData? sufix,
         void Function()? ontap,
@@ -63,6 +74,7 @@ Widget dfaultFormField(
       style: TextStyle(color: Colors.white),
       decoration: InputDecoration(
           labelText: label,
+          labelStyle: textStyle,
           prefixIcon: prefix,
           suffixIcon: sufix != null
               ? IconButton(
@@ -72,5 +84,35 @@ Widget dfaultFormField(
                     color: Colors.white,
                   ))
               : null,
-          border: const OutlineInputBorder()),
+          border: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(15.0))
+          )),
     );
+
+Future<bool?> showToast({String? msg, ToastState? state}) =>
+    Fluttertoast.showToast(
+        msg: msg!,
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 5,
+        backgroundColor: changeColor(state!),
+        textColor: Colors.white,
+        fontSize: 16.0);
+
+enum ToastState { Success, Error, Warning }
+
+Color? changeColor(ToastState state) {
+  Color color;
+  switch (state) {
+    case ToastState.Success:
+      color = Colors.green;
+      break;
+    case ToastState.Error:
+      color = Colors.red;
+      break;
+      case ToastState.Warning:
+      color =Colors.amber;
+      break;
+      }
+      return color;
+}

@@ -67,6 +67,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '324113708961',
     projectId: 'cine-world-9ab61',
     storageBucket: 'cine-world-9ab61.appspot.com',
+    iosClientId: '324113708961-tc4gu4418o69f3b6lnrlpukfr2coks11.apps.googleusercontent.com',
     iosBundleId: 'com.example.weMovies',
   );
 
@@ -76,6 +77,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '324113708961',
     projectId: 'cine-world-9ab61',
     storageBucket: 'cine-world-9ab61.appspot.com',
+    iosClientId: '324113708961-00mc1rj1e2qbgsi751sd9t45me9unslv.apps.googleusercontent.com',
     iosBundleId: 'com.example.weMovies.RunnerTests',
   );
 }
