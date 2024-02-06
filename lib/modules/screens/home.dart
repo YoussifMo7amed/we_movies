@@ -6,6 +6,7 @@ import 'package:we_movies/model/UserModel.dart';
 import 'package:we_movies/model/home_Upcoming_Model.dart';
 import 'package:we_movies/modules/bloc/cubit.dart';
 import 'package:we_movies/modules/bloc/states.dart';
+import 'package:we_movies/shared/constants/constants.dart';
 import 'package:we_movies/shared/styles/colors.dart';
 
 class Home extends StatelessWidget {
@@ -14,11 +15,11 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<MovieCubit, MovieStates>(
-      listener: (context, state) {
-      
-      },
+      listener: (context, state) {},
       builder: (context, state) {
         var cubit = MovieCubit.get(context);
+        cubit.getGenreNames(
+            genres: genres, genreIds: cubit.trendingModel!.result[0].genres);
         return StreamBuilder(
           stream: cubit.reference.doc(cubit.uid).snapshots(),
           builder: (context, snapshot) {
@@ -101,7 +102,7 @@ class Home extends StatelessWidget {
                             physics: BouncingScrollPhysics(),
                             scrollDirection: Axis.horizontal,
                             itemCount:
-                                5, // Placeholder for the number of movies
+                                cubit.upComingModel!.result.length, // Placeholder for the number of movies
                             itemBuilder: (context, index) {
                               return Container(
                                 margin: EdgeInsets.only(right: 26),
@@ -147,7 +148,7 @@ class Home extends StatelessWidget {
                             physics: BouncingScrollPhysics(),
                             scrollDirection: Axis.horizontal,
                             itemCount:
-                                5, // Placeholder for the number of trending movies
+                                cubit.trendingModel!.result.length, // Placeholder for the number of trending movies
                             itemBuilder: (context, index) {
                               return Padding(
                                 padding: const EdgeInsets.only(right: 8.0),
@@ -184,7 +185,7 @@ class Home extends StatelessWidget {
                                         width: 125,
                                         height: 50,
                                         child: Text(
-                                          "${cubit.trendingModel!.result[index].title}",
+                                          "${cubit.getGenreNames(genres: genres, genreIds: cubit.trendingModel!.result[index].genres).join(" , ")}",
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                           style: TextStyle(

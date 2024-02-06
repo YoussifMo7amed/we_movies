@@ -99,3 +99,13 @@ class MovieDetailsErrorState extends MovieStates{
   MovieDetailsErrorState(this.error);
 
 }
+class MovieSearchLoadingState extends MovieStates{}
+
+class MovieSearchSuccesState extends MovieStates{}
+
+class MovieSearchErrorState extends MovieStates{
+   final String error;
+
+  MovieSearchErrorState(this.error);
+
+}

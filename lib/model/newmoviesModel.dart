@@ -13,6 +13,8 @@ class Result {
     bool ?adult;
     String? backdropPath;
     int? id;
+          List<dynamic> genres = [];
+
     String? originalLanguage;
     String? originalTitle;
     String ?overview;
@@ -27,6 +29,8 @@ class Result {
  Result.fromjson(Map<String,dynamic>json){
  adult=json['adult'];
      backdropPath=json['backdrop_path'];
+          genres=json['genre_ids'];
+
     id=json['id'];
      originalLanguage=json['originalLanguage'];
      originalTitle=json['original_title'];

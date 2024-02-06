@@ -1,4 +1,3 @@
-import 'dart:ffi';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:we_movies/model/DetailsModel.dart';
+import 'package:we_movies/model/SearchModel.dart';
 import 'package:we_movies/model/home_Trending_Model.dart';
 import 'package:we_movies/model/home_Upcoming_Model.dart';
 import 'package:we_movies/model/newmoviesModel.dart';
@@ -17,6 +17,7 @@ import 'package:we_movies/modules/screens/home.dart';
 import 'package:we_movies/modules/screens/profile.dart';
 import 'package:we_movies/modules/screens/search.dart';
 import 'package:we_movies/shared/components/component.dart';
+import 'package:we_movies/shared/constants/constants.dart';
 import 'package:we_movies/shared/network/endpoints.dart';
 import 'package:we_movies/shared/network/remote/dio_helpear.dart';
 
@@ -34,9 +35,10 @@ class MovieCubit extends Cubit<MovieStates> {
   NewMoviesModel? newMoviesModel;
   PopularMoviesModel? popularMoviesModel;
   DetailsMoviesModel?detailsMoviesModel;
+  SearchMoviesModel?searchMoviesModel;
   List<Widget> bottomscreens = [
     Home(),
-    Search(),
+    SearchPage(),
     Profile(),
   ];
   int currentIndex = 0;
@@ -287,6 +289,40 @@ class MovieCubit extends Cubit<MovieStates> {
       emit(MovieDetailsSuccesState());
     }).catchError((error) {
       emit(MovieDetailsErrorState(error));
+      print('Error${error}');
+    });
+  }
+ List<String> getGenreNames({required List<Map<String, dynamic>> genres,required List<dynamic> genreIds}) {
+  List<String> genreNames = [];
+
+  for (int id in genreIds) {
+    Map<String, dynamic>? genre = genres.firstWhere(
+      (element) => element['id'] == id,
+      orElse: () {
+        return null!;
+      },
+    );
+
+    if (genre != null) {
+      genreNames.add(genre['name']);
+    }
+  }
+
+  return genreNames;
+}
+  void getSearch({required String query}) {
+    emit(MovieSearchLoadingState());
+    DioHelper.getData(
+      url: Search,
+      query: {
+        'query':query,
+      }
+    ).then((value) {
+      searchMoviesModel = SearchMoviesModel.fromjson(value.data);
+
+      emit(MovieSearchSuccesState());
+    }).catchError((error) {
+      emit(MovieSearchErrorState(error));
       print('Error${error}');
     });
   }

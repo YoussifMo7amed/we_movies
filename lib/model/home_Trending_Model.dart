@@ -13,7 +13,7 @@ class Result {
     bool ?adult;
     String? backdropPath;
     int? id;
-      List<Genre> genres = [];
+      List<dynamic> genres = [];
 
     String? originalLanguage;
     String? originalTitle;
@@ -27,9 +27,7 @@ class Result {
     int ?voteCount;
 
  Result.fromjson(Map<String,dynamic>json){
-      json['genres'].forEach((element) {
-      genres.add(Genre.fromjson(element));
-    });
+     genres=json['genre_ids'];
      adult=json['adult'];
      backdropPath=json['backdrop_path'];
     id=json['id'];
@@ -45,13 +43,4 @@ class Result {
      voteCount=json['vote_count'];
 }
 
-}
-class Genre {
-  int? id;
-  String? name;
-
-  Genre.fromjson(Map<String, dynamic> json) {
-    id = json['id'];
-    name = json['name'];
-  }
 }

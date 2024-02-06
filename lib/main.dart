@@ -46,7 +46,7 @@ class CineWorld extends StatelessWidget {
           'LoginPage': (context) => LoginPage(),
           'RegisterPage': (context) => RegisterPage(),
           'ProfileData': (context) => ProfileData(),
-          'search':(context) => Search(),
+          'search':(context) => SearchPage(),
         },
       ),
     );

@@ -1,8 +1,8 @@
-class PopularMoviesModel {
+class SearchMoviesModel {
   int? page;
   List<Result> result = [];
 
-  PopularMoviesModel.fromjson(Map<String, dynamic> json) {
+  SearchMoviesModel.fromjson(Map<String, dynamic> json) {
     page = json['page'];
     json['results'].forEach((element) {
       result.add(Result.fromjson(element));
