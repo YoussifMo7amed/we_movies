@@ -1,4 +1,5 @@
-import 'package:firebase_auth/firebase_auth.dart';
+// ignore_for_file: non_constant_identifier_names, constant_identifier_names
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -14,7 +15,7 @@ Widget defaultButton({
   required String text,
 }) =>
     Container(
-        margin: EdgeInsets.symmetric(horizontal: 20.0),
+        margin: const EdgeInsets.symmetric(horizontal: 20.0),
         width: width,
         height: 50.0,
         decoration: BoxDecoration(
@@ -30,13 +31,13 @@ Widget defaultButton({
               ),
             Padding(
               padding: is_image
-                  ? EdgeInsets.only(left: 30.0, right: 50)
-                  : EdgeInsets.all(0),
+                  ? const EdgeInsets.only(left: 30.0, right: 50)
+                  : const EdgeInsets.all(0),
               child: MaterialButton(
                 height: 50.0,
                 minWidth: 40,
                 onPressed: function,
-                child: Container(
+                child: SizedBox(
                   width: !is_image?320:null,
 
                   child: Text(
@@ -71,7 +72,7 @@ Widget dfaultFormField(
       onFieldSubmitted: onsubmit,
       validator: validator,
       onTap: ontap,
-      style: TextStyle(color: Colors.white),
+      style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
           labelText: label,
           labelStyle: textStyle,

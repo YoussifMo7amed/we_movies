@@ -51,6 +51,7 @@ dependencies:
   conditional_builder_null_safety: ^0.0.6
   dio: ^5.4.0
   fluttertoast: ^8.2.4
+  youtube_player_flutter: ^8.1.2
 
 dev_dependencies:
   flutter_test:

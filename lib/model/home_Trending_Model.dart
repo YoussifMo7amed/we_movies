@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 class TrendingModel{
   int? page;
  List<Result> result=[];

@@ -1,15 +1,17 @@
+// ignore_for_file: null_check_always_fails, unnecessary_null_comparison, unnecessary_nullable_for_final_variable_declarations, non_constant_identifier_names
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:we_movies/model/DetailsModel.dart';
 import 'package:we_movies/model/SearchModel.dart';
+import 'package:we_movies/model/creditModel.dart';
 import 'package:we_movies/model/home_Trending_Model.dart';
 import 'package:we_movies/model/home_Upcoming_Model.dart';
+import 'package:we_movies/model/movievideoModel.dart';
 import 'package:we_movies/model/newmoviesModel.dart';
 import 'package:we_movies/model/popularmoviesModel.dart';
 import 'package:we_movies/modules/bloc/states.dart';
@@ -20,6 +22,7 @@ import 'package:we_movies/shared/components/component.dart';
 import 'package:we_movies/shared/constants/constants.dart';
 import 'package:we_movies/shared/network/endpoints.dart';
 import 'package:we_movies/shared/network/remote/dio_helpear.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class MovieCubit extends Cubit<MovieStates> {
   MovieCubit(this.context) : super(MovieInitialState());
@@ -27,17 +30,20 @@ class MovieCubit extends Cubit<MovieStates> {
   static MovieCubit get(context) => BlocProvider.of(context);
   CollectionReference reference =
       FirebaseFirestore.instance.collection('UserProfile');
-  final String? uid = FirebaseAuth.instance.currentUser!.email;
   //User userInfo = FirebaseAuth.instance.currentUser!;
-
+  List genreNames = [];
   UpComingModel? upComingModel;
   TrendingModel? trendingModel;
   NewMoviesModel? newMoviesModel;
   PopularMoviesModel? popularMoviesModel;
-  DetailsMoviesModel?detailsMoviesModel;
-  SearchMoviesModel?searchMoviesModel;
+  DetailsMoviesModel? detailsMoviesModel;
+  SearchMoviesModel? searchMoviesModel;
+  CreditModel? creditModel;
+  VideoModel? videoModel;
+  late YoutubePlayerController controller;
+
   List<Widget> bottomscreens = [
-    Home(),
+    const Home(),
     SearchPage(),
     Profile(),
   ];
@@ -53,19 +59,7 @@ class MovieCubit extends Cubit<MovieStates> {
       {required String emailAddress, required String password}) async {
     emit(MovieRegisterLoadingState());
     try {
-      print('ok');
 
-      final credential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
-        email: emailAddress,
-        password: password,
-      )
-          .then((value) {
-        showToast(msg: "successfully Registered", state: ToastState.Success);
-        print(uid);
-        //  Showmessage(context, "successfully Registered");
-        emit(MovieRegisterSuccesState());
-      });
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         showToast(
@@ -80,7 +74,6 @@ class MovieCubit extends Cubit<MovieStates> {
         // Showmessage(context, 'The account already exists for that email.');
       }
     } catch (e) {
-      print(e);
       showToast(msg: e.toString(), state: ToastState.Error);
       emit(MovieRegisterErrorState(e.toString()));
     }
@@ -91,12 +84,6 @@ class MovieCubit extends Cubit<MovieStates> {
     emit(MovieLoginLoadingState());
 
     try {
-      final credential = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: emailAddress, password: password)
-          .then((value) {
-        showToast(msg: "Signed In successfully", state: ToastState.Success);
-        emit(MovieLoginSuccesState());
-      });
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         showToast(
@@ -112,7 +99,6 @@ class MovieCubit extends Cubit<MovieStates> {
       showToast(msg: e.toString(), state: ToastState.Error);
 
       emit(MovieLoginErrorState(e.toString()));
-      print(e.toString());
     }
   }
 
@@ -125,7 +111,7 @@ class MovieCubit extends Cubit<MovieStates> {
     }
     // Obtain the auth details from the request
     final GoogleSignInAuthentication? googleAuth =
-        await googleUser?.authentication;
+        await googleUser.authentication;
 
     // Create a new credential
     final credential = GoogleAuthProvider.credential(
@@ -152,6 +138,8 @@ class MovieCubit extends Cubit<MovieStates> {
       'country': country,
       'image': imageUrl,
     };
+      final String? uid = FirebaseAuth.instance.currentUser!.email;
+
     return reference.doc(uid).set(dataToSend).then((value) {
       emit(MovieAddUserSuccesState());
     }).catchError((error) {
@@ -170,8 +158,10 @@ class MovieCubit extends Cubit<MovieStates> {
     emit(MovieUpdateUserLoadingState());
     Map<String, dynamic> dataToUpdate = {
       'name': name,
-      'phone':phoneNumber,
+      'phone': phoneNumber,
     };
+      final String? uid = FirebaseAuth.instance.currentUser!.email;
+
     return reference.doc(uid).update(dataToUpdate).then((value) {
       emit(MovieUpdateUserSuccesState());
     }).catchError((error) {
@@ -218,13 +208,10 @@ class MovieCubit extends Cubit<MovieStates> {
       url: UpComing,
     ).then((value) {
       upComingModel = UpComingModel.fromjson(value.data);
-      print(upComingModel!.page);
 
-      print(upComingModel!.result[0].backdropPath);
       emit(MovieUpComingSuccesState());
     }).catchError((error) {
       emit(MovieUpComingErrorState(error));
-      print('Error${error}');
     });
   }
 
@@ -234,13 +221,10 @@ class MovieCubit extends Cubit<MovieStates> {
       url: Trending,
     ).then((value) {
       trendingModel = TrendingModel.fromjson(value.data);
-      print(trendingModel!.page);
 
-      print(trendingModel!.result[0].backdropPath);
       emit(MovieTrendingSuccesState());
     }).catchError((error) {
       emit(MovieTrendingErrorState(error));
-      print('Error${error}');
     });
   }
 
@@ -250,13 +234,10 @@ class MovieCubit extends Cubit<MovieStates> {
       url: NewMovies,
     ).then((value) {
       newMoviesModel = NewMoviesModel.fromjson(value.data);
-      print(newMoviesModel!.page);
 
-      print(newMoviesModel!.result[0].backdropPath);
       emit(MovieNewMoviesSuccesState());
     }).catchError((error) {
       emit(MovieNewMoviesErrorState(error));
-      print('Error${error}');
     });
   }
 
@@ -266,64 +247,100 @@ class MovieCubit extends Cubit<MovieStates> {
       url: Popular,
     ).then((value) {
       popularMoviesModel = PopularMoviesModel.fromjson(value.data);
-      print(popularMoviesModel!.page);
 
-      print(popularMoviesModel!.result[0].backdropPath);
       emit(MoviePopularSuccesState());
     }).catchError((error) {
       emit(MoviePopularErrorState(error));
-      print('Error${error}');
     });
   }
-   void getDetailsMovies({required int movie_id}) {
+
+  void getDetailsMovies({required int movie_id}) {
     emit(MovieDetailsLoadingState());
     DioHelper.getData(
-      url: Details,
-      query: {
-        'movie_id':movie_id
-      }
+      url: 'movie/$movie_id?api_key=$api_key&page=1',
     ).then((value) {
       detailsMoviesModel = DetailsMoviesModel.fromjson(value.data);
-      print(detailsMoviesModel!.originalTitle);
+      for (var element in detailsMoviesModel!.genres) {
+        genreNames.add(element.name);
+      }
 
       emit(MovieDetailsSuccesState());
     }).catchError((error) {
       emit(MovieDetailsErrorState(error));
-      print('Error${error}');
     });
   }
- List<String> getGenreNames({required List<Map<String, dynamic>> genres,required List<dynamic> genreIds}) {
-  List<String> genreNames = [];
 
-  for (int id in genreIds) {
-    Map<String, dynamic>? genre = genres.firstWhere(
-      (element) => element['id'] == id,
-      orElse: () {
-        return null!;
-      },
-    );
+  void getCreditMovies({required int movie_id}) {
+    emit(MovieCreditsLoadingState());
+    DioHelper.getData(
+      url: 'movie/$movie_id/credits?api_key=$api_key',
+    ).then((value) {
+      creditModel = CreditModel.fromjson(value.data);
 
-    if (genre != null) {
-      genreNames.add(genre['name']);
-    }
+      emit(MovieCreditsSuccesState());
+    }).catchError((error) {
+      emit(MovieCreditsErrorState(error));
+    });
   }
 
-  return genreNames;
-}
+  void getVideo({required int movie_id}) {
+    emit(MovieVideoLoadingState());
+    DioHelper.getData(
+      url: 'movie/$movie_id/videos?api_key=$api_key',
+    ).then((value) {
+      videoModel = VideoModel.fromjson(value.data);
+
+      emit(MovieVideoSuccesState());
+    }).catchError((error) {
+      emit(MovieVideoErrorState(error));
+    });
+  }
+
+  List<String> getGenreNames(
+      {required List<Map<String, dynamic>> genres,
+      required List<dynamic> genreIds}) {
+    List<String> genreNames = [];
+
+    for (int id in genreIds) {
+      Map<String, dynamic>? genre = genres.firstWhere(
+        (element) => element['id'] == id,
+        orElse: () {
+          return null!;
+        },
+      );
+
+      if (genre != null) {
+        genreNames.add(genre['name']);
+      }
+    }
+
+    return genreNames;
+  }
+
   void getSearch({required String query}) {
     emit(MovieSearchLoadingState());
-    DioHelper.getData(
-      url: Search,
-      query: {
-        'query':query,
-      }
-    ).then((value) {
+    DioHelper.getData(url: Search, query: {
+      'query': query,
+    }).then((value) {
       searchMoviesModel = SearchMoviesModel.fromjson(value.data);
 
       emit(MovieSearchSuccesState());
     }).catchError((error) {
       emit(MovieSearchErrorState(error));
-      print('Error${error}');
     });
+  }
+
+  String? gettrail() {
+        emit(MovieGetTrailLoadingstate());
+
+    String? id;
+    for (var element in videoModel!.result) {
+      if (element.name!.contains("Trailer")) {
+        id = element.key;
+      }
+    }
+            emit(MovieGetTrailSucessstate());
+
+    return id;
   }
 }

@@ -1,4 +1,5 @@
-import 'package:we_movies/modules/screens/search.dart';
+// ignore_for_file: constant_identifier_names
+
 import 'package:we_movies/shared/constants/constants.dart';
 
 const UpComing='movie/upcoming?api_key=$api_key';

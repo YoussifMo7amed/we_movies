@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:we_movies/shared/components/component.dart';
+import 'package:we_movies/shared/network/local/cache.dart';
 import 'package:we_movies/shared/styles/colors.dart';
 
 class BoardingModel {
@@ -46,15 +47,15 @@ class _onBoardingSCreenState extends State<onBoardingSCreen> {
         children: [
           Row(
             children: [
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
-              Container(
+              SizedBox(
                   height: 50,
                   child: Image.asset(
                     "assets/app logo.png",
                   )),
-              SizedBox(
+              const SizedBox(
                 width: 20,
               ),
               Text(
@@ -67,7 +68,7 @@ class _onBoardingSCreenState extends State<onBoardingSCreen> {
               )
             ],
           ),
-          Container(
+          SizedBox(
             height: 500,
             width: 600,
             child: PageView.builder(
@@ -101,13 +102,16 @@ class _onBoardingSCreenState extends State<onBoardingSCreen> {
                 dotColor: Colors.grey,
                 activeDotColor: Colors.grey),
           ),
-          SizedBox(
+          const SizedBox(
             height: 30.0,
           ),
           defaultButton(
               function: () {
                 if (isLast) {
+                   casheHealper.saveData(key: 'onBoarding', value: true).then((value) {
                   Navigator.pushNamedAndRemoveUntil(context, "LoginPage", (route) => false);
+
+                   });
                 } else {
                   controler.nextPage(
                       duration: const Duration(milliseconds: 750),
@@ -128,7 +132,7 @@ Widget OnBoardingSCreens(BoardingModel model) => Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
+          SizedBox(
             height: 200,
             width: 327,
             child: Image.asset(

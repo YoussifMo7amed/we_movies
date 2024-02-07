@@ -88,7 +88,6 @@ class MovieUpdateUserErrorState extends MovieStates{
   MovieUpdateUserErrorState(this.error);
 
 }
-
 class MovieDetailsLoadingState extends MovieStates{}
 
 class MovieDetailsSuccesState extends MovieStates{}
@@ -97,6 +96,28 @@ class MovieDetailsErrorState extends MovieStates{
    final String error;
 
   MovieDetailsErrorState(this.error);
+
+}
+
+class MovieCreditsLoadingState extends MovieStates{}
+
+class MovieCreditsSuccesState extends MovieStates{}
+
+class MovieCreditsErrorState extends MovieStates{
+   final String error;
+
+  MovieCreditsErrorState(this.error);
+
+}
+
+class MovieVideoLoadingState extends MovieStates{}
+
+class MovieVideoSuccesState extends MovieStates{}
+
+class MovieVideoErrorState extends MovieStates{
+   final String error;
+
+  MovieVideoErrorState(this.error);
 
 }
 class MovieSearchLoadingState extends MovieStates{}
@@ -109,3 +130,5 @@ class MovieSearchErrorState extends MovieStates{
   MovieSearchErrorState(this.error);
 
 }
+class MovieGetTrailLoadingstate extends MovieStates{}
+class MovieGetTrailSucessstate extends MovieStates{}

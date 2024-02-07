@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names, unnecessary_null_in_if_null_operators
+
 import 'package:dio/dio.dart';
 
 class DioHelper {
@@ -24,6 +26,7 @@ class DioHelper {
     return await dio!.get(
       url,
       queryParameters: query ?? null,
+    
     );
   }
 

@@ -1,9 +1,12 @@
+// ignore_for_file: must_be_immutable, file_names, non_constant_identifier_names
+
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:we_movies/modules/bloc/cubit.dart';
 import 'package:we_movies/modules/bloc/states.dart';
 import 'package:we_movies/shared/components/component.dart';
+import 'package:we_movies/shared/network/local/cache.dart';
 import 'package:we_movies/shared/styles/colors.dart';
 
 class LoginPage extends StatelessWidget {
@@ -17,6 +20,10 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<MovieCubit, MovieStates>(listener: (context, state) {
+       if(state is MovieLoginSuccesState){
+
+          casheHealper.saveData(key: "email", value: 'email');
+        }
       if (state is MovieLoginSuccesState) {
         Navigator.pushNamedAndRemoveUntil(context, "home", (route) => false);
       } 
@@ -175,7 +182,7 @@ class LoginPage extends StatelessWidget {
                   ),
                   ConditionalBuilder(
                     condition: state is! MovieLoginLoadingState,
-                   fallback: (context) => Center(child: CircularProgressIndicator(),),
+                   fallback: (context) => const Center(child: CircularProgressIndicator(),),
                     builder:(context) =>  defaultButton(
                         function: () {
                           if (Formkey.currentState!.validate()) {
@@ -185,7 +192,6 @@ class LoginPage extends StatelessWidget {
                                   password: password!,
                                 )
                                 .then((value) {});
-                            print('ok');
                           }
                         },
                         text: "Log In My Account",

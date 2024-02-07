@@ -1,9 +1,12 @@
+// ignore_for_file: must_be_immutable, file_names, non_constant_identifier_names
+
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:we_movies/modules/bloc/cubit.dart';
 import 'package:we_movies/modules/bloc/states.dart';
 import 'package:we_movies/shared/components/component.dart';
+import 'package:we_movies/shared/network/local/cache.dart';
 import 'package:we_movies/shared/styles/colors.dart';
 
 class RegisterPage extends StatelessWidget {
@@ -17,7 +20,12 @@ class RegisterPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<MovieCubit, MovieStates>(
-      listener: (context, state) {},
+      listener: (context, state) {
+        if(state is MovieRegisterSuccesState){
+
+          casheHealper.saveData(key: "email", value: email);
+        }
+      },
       builder: (context, state) {
         var cubit = MovieCubit.get(context);
         return Scaffold(
@@ -221,7 +229,7 @@ class RegisterPage extends StatelessWidget {
                     ),
                     ConditionalBuilder(
                       condition: state is! MovieRegisterLoadingState,
-                      fallback: (context) => Center(
+                      fallback: (context) => const Center(
                         child: CircularProgressIndicator(),
                       ),
                       builder: (context) => defaultButton(

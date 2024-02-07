@@ -1,7 +1,9 @@
+// ignore_for_file: must_be_immutable, non_constant_identifier_names
+
 import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,6 +13,7 @@ import 'package:we_movies/model/UserModel.dart';
 import 'package:we_movies/modules/bloc/cubit.dart';
 import 'package:we_movies/modules/bloc/states.dart';
 import 'package:we_movies/shared/components/component.dart';
+import 'package:we_movies/shared/network/local/cache.dart';
 import 'package:we_movies/shared/styles/colors.dart';
 
 class Profile extends StatelessWidget {
@@ -27,36 +30,37 @@ class Profile extends StatelessWidget {
     return BlocConsumer<MovieCubit, MovieStates>(
         listener: (context, state) {},
         builder: (context, state) {
-          var cubit = MovieCubit.get(context);
-         return StreamBuilder(
-          stream: cubit.reference.doc(cubit.uid).snapshots(),
-          builder: (context, snapshot) {
-            Message? message;
-     if (snapshot.hasData&&snapshot.data!.data()!=null) {
-    // Access data directly from the single document snapshot
-    Map<String, dynamic> userInfo = snapshot.data!.data()! as Map<String, dynamic>;
+            final String? uid = FirebaseAuth.instance.currentUser!.email;
 
-    // Create a Message object from the data
-    message = Message.fromjson(userInfo);
-      Namecontroller.text = message.name;
+          var cubit = MovieCubit.get(context);
+          return StreamBuilder(
+            
+            stream: cubit.reference.doc(uid).snapshots(),
+            builder: (context, snapshot) {
+              Message? message;
+              if (snapshot.hasData && snapshot.data!.data() != null) {
+                // Access data directly from the single document snapshot
+                Map<String, dynamic> userInfo =
+                    snapshot.data!.data()! as Map<String, dynamic>;
+
+                // Create a Message object from the data
+                message = Message.fromjson(userInfo);
+                Namecontroller.text = message.name;
                 Phonecontroller.text = message.phone;
                 Datecontroller.text = message.date;
                 Countrycontroller.text = message.country;
-  }
-
-           
-              
+              }
 
               return Form(
                 key: Formkey,
                 child: SingleChildScrollView(
                   physics: const NeverScrollableScrollPhysics(),
                   child: SizedBox(
-                    height: 750,
+                    height: 800,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        SizedBox(
+                        const SizedBox(
                           height: 100,
                         ),
                         Row(
@@ -106,7 +110,6 @@ class Profile extends StatelessWidget {
                             ImagePicker imagePicker = ImagePicker();
                             XFile? file = await imagePicker.pickImage(
                                 source: ImageSource.camera);
-                            print('${file?.path}');
                             if (file == null) return;
                             //Import dart:core
                             String uniqueFileName = DateTime.now()
@@ -155,10 +158,10 @@ class Profile extends StatelessWidget {
                                   size: 38,
                                 ),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 10.0,
                               ),
-                              Text(
+                              const Text(
                                 "Upload your Profile Picture",
                                 style: TextStyle(
                                     color: Colors.white,
@@ -357,9 +360,11 @@ class Profile extends StatelessWidget {
                           height: 30.0,
                         ),
                         ConditionalBuilder(
-                          condition: state is!MovieUpdateUserLoadingState,
-                          fallback: (context) => Center(child: CircularProgressIndicator(),),
-                          builder:(context) => defaultButton(
+                          condition: state is! MovieUpdateUserLoadingState,
+                          fallback: (context) => const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                          builder: (context) => defaultButton(
                               function: () {
                                 if (Formkey.currentState!.validate()) {
                                   String? name = Namecontroller.text;
@@ -367,11 +372,11 @@ class Profile extends StatelessWidget {
                                   String? date = Datecontroller.text;
                                   String? country = Countrycontroller.text;
                                   cubit.UpdateUser(
-                                      name: name,
-                                      phoneNumber: phone,
-                                      dateOfBirth: date,
-                                      country: country,
-                                     );
+                                    name: name,
+                                    phoneNumber: phone,
+                                    dateOfBirth: date,
+                                    country: country,
+                                  );
                                 }
                               },
                               text: "Update",
@@ -379,6 +384,18 @@ class Profile extends StatelessWidget {
                               background: Colors.blue,
                               radius: 30.0),
                         ),
+                        const SizedBox(height: 10.0,)
+,                        defaultButton(
+                            function: ()async {
+                              await FirebaseAuth.instance.signOut().then((value) {
+                              casheHealper.RemoveData(Key: 'email');
+                              Navigator.pushNamedAndRemoveUntil(context, "LoginPage", (route) => false);
+                              });
+                            },
+                            text: "LogOut",
+                            isUpperCase: true,
+                            background: const Color.fromARGB(255, 99, 113, 138),
+                            radius: 30.0)
                       ],
                     ),
                   ),

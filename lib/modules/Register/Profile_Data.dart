@@ -1,6 +1,7 @@
+// ignore_for_file: must_be_immutable, file_names, non_constant_identifier_names
+
 import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -87,7 +88,6 @@ class ProfileData extends StatelessWidget {
                           ImagePicker imagePicker = ImagePicker();
                           XFile? file = await imagePicker.pickImage(
                               source: ImageSource.camera);
-                          print('${file?.path}');
                           if (file == null) return;
                           //Import dart:core
                           String uniqueFileName =
@@ -135,10 +135,10 @@ class ProfileData extends StatelessWidget {
                                 size: 38,
                               ),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               width: 10.0,
                             ),
-                            Text(
+                            const Text(
                               "Upload your Profile Picture",
                               style: TextStyle(
                                   color: Colors.white,
@@ -338,7 +338,7 @@ class ProfileData extends StatelessWidget {
                       ),
                       ConditionalBuilder(
                         condition: state is! MovieAddUserLoadingState,
-                        fallback: (context) => Center(
+                        fallback: (context) => const Center(
                           child: CircularProgressIndicator(),
                         ),
                         builder: (context) => defaultButton(
@@ -367,6 +367,7 @@ class ProfileData extends StatelessWidget {
                             background: Colors.blue,
                             radius: 30.0),
                       ),
+                      
                     ],
                   ),
                 ),

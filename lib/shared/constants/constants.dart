@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 const api_key='108030f18ebea5a3cf42c94cf9017fcf';
 List<Map<String,dynamic>> genres= [
     {
@@ -77,3 +79,5 @@ List<Map<String,dynamic>> genres= [
       "name": "Western"
     }
   ];
+
+
