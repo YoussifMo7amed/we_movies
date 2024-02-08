@@ -1,5 +1,5 @@
 // ignore_for_file: null_check_always_fails, unnecessary_null_comparison, unnecessary_nullable_for_final_variable_declarations, non_constant_identifier_names
-
+  import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +21,7 @@ import 'package:we_movies/modules/screens/search.dart';
 import 'package:we_movies/shared/components/component.dart';
 import 'package:we_movies/shared/constants/constants.dart';
 import 'package:we_movies/shared/network/endpoints.dart';
+import 'package:we_movies/shared/network/local/cache.dart';
 import 'package:we_movies/shared/network/remote/dio_helpear.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
@@ -32,6 +33,8 @@ class MovieCubit extends Cubit<MovieStates> {
       FirebaseFirestore.instance.collection('UserProfile');
   //User userInfo = FirebaseAuth.instance.currentUser!;
   List genreNames = [];
+    final TextEditingController Registeremailcontroller = TextEditingController();
+    
   UpComingModel? upComingModel;
   TrendingModel? trendingModel;
   NewMoviesModel? newMoviesModel;
@@ -40,6 +43,7 @@ class MovieCubit extends Cubit<MovieStates> {
   SearchMoviesModel? searchMoviesModel;
   CreditModel? creditModel;
   VideoModel? videoModel;
+
   late YoutubePlayerController controller;
 
   List<Widget> bottomscreens = [
@@ -59,7 +63,16 @@ class MovieCubit extends Cubit<MovieStates> {
       {required String emailAddress, required String password}) async {
     emit(MovieRegisterLoadingState());
     try {
-
+ final credential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+        email: emailAddress,
+        password: password,
+      )
+          .then((value) {
+            casheHealper.saveData(key: "Id", value: Registeremailcontroller.text);
+        showToast(msg: "successfully Registered", state: ToastState.Success);
+        emit(MovieRegisterSuccesState());
+      });
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         showToast(
@@ -84,6 +97,7 @@ class MovieCubit extends Cubit<MovieStates> {
     emit(MovieLoginLoadingState());
 
     try {
+      emit(MovieLoginSuccesState());
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         showToast(
@@ -138,9 +152,9 @@ class MovieCubit extends Cubit<MovieStates> {
       'country': country,
       'image': imageUrl,
     };
-      final String? uid = FirebaseAuth.instance.currentUser!.email;
+     // final String? uid = FirebaseAuth.instance.currentUser!.email;
 
-    return reference.doc(uid).set(dataToSend).then((value) {
+    return reference.doc(casheHealper.get(key: "Id")).set(dataToSend).then((value) {
       emit(MovieAddUserSuccesState());
     }).catchError((error) {
       showToast(msg: error.toString(), state: ToastState.Error);
@@ -160,9 +174,8 @@ class MovieCubit extends Cubit<MovieStates> {
       'name': name,
       'phone': phoneNumber,
     };
-      final String? uid = FirebaseAuth.instance.currentUser!.email;
 
-    return reference.doc(uid).update(dataToUpdate).then((value) {
+    return reference.doc(Registeremailcontroller.text).update(dataToUpdate).then((value) {
       emit(MovieUpdateUserSuccesState());
     }).catchError((error) {
       showToast(msg: error.toString(), state: ToastState.Error);

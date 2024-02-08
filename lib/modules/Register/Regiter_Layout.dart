@@ -11,7 +11,7 @@ import 'package:we_movies/shared/styles/colors.dart';
 
 class RegisterPage extends StatelessWidget {
   RegisterPage({super.key});
-  final TextEditingController emailcontroller = TextEditingController();
+
   final TextEditingController passwordcontroller = TextEditingController();
   final TextEditingController re_passwordcontroller = TextEditingController();
   final GlobalKey<ScaffoldState> Scaffoldkey = GlobalKey<ScaffoldState>();
@@ -21,9 +21,10 @@ class RegisterPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocConsumer<MovieCubit, MovieStates>(
       listener: (context, state) {
-        if(state is MovieRegisterSuccesState){
-
-          casheHealper.saveData(key: "email", value: email);
+        if (state is MovieRegisterSuccesState) {
+          casheHealper.saveData(key: "email", value: "$email");
+          Navigator.pushNamedAndRemoveUntil(
+              context, "ProfileData", (route) => false);
         }
       },
       builder: (context, state) {
@@ -85,7 +86,7 @@ class RegisterPage extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: dfaultFormField(
-                          controller: emailcontroller,
+                          controller: cubit.Registeremailcontroller,
                           type: TextInputType.emailAddress,
                           label: "E-mail",
                           onChange: (data) {
@@ -241,12 +242,7 @@ class RegisterPage extends StatelessWidget {
                                     .createUserWithEmailAndPassword(
                                         emailAddress: email!,
                                         password: password!)
-                                    .then((value) => {
-                                          Navigator.pushNamedAndRemoveUntil(
-                                              context,
-                                              "ProfileData",
-                                              (route) => false)
-                                        });
+                                    .then((value) => {});
                               }
                             }
                           },

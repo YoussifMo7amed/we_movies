@@ -6,6 +6,7 @@ import 'package:we_movies/model/UserModel.dart';
 import 'package:we_movies/modules/bloc/cubit.dart';
 import 'package:we_movies/modules/bloc/states.dart';
 import 'package:we_movies/shared/constants/constants.dart';
+import 'package:we_movies/shared/network/local/cache.dart';
 import 'package:we_movies/shared/styles/colors.dart';
 
 class Home extends StatelessWidget {
@@ -25,10 +26,10 @@ class Home extends StatelessWidget {
           cubit.getGenreNames(
               genres: genres, genreIds: cubit.trendingModel!.result[0].genres);
         }
-  final String? uid = FirebaseAuth.instance.currentUser!.email;
+ // final String? uid = FirebaseAuth.instance.currentUser!.email;
 
         return StreamBuilder(
-          stream: cubit.reference.doc(uid).snapshots(),
+          stream: cubit.reference.doc(casheHealper.get(key: "Id")).snapshots(),
           builder: (context, snapshot) {
             Message? message;
             if (snapshot.hasData && snapshot.data!.data() != null) {

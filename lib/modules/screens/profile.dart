@@ -1,7 +1,4 @@
-// ignore_for_file: must_be_immutable, non_constant_identifier_names
-
 import 'dart:io';
-
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -30,12 +27,12 @@ class Profile extends StatelessWidget {
     return BlocConsumer<MovieCubit, MovieStates>(
         listener: (context, state) {},
         builder: (context, state) {
-            final String? uid = FirebaseAuth.instance.currentUser!.email;
+           // final String? uid = FirebaseAuth.instance.currentUser!.email;
 
           var cubit = MovieCubit.get(context);
           return StreamBuilder(
             
-            stream: cubit.reference.doc(uid).snapshots(),
+            stream: cubit.reference.doc(casheHealper.get(key: "Id")).snapshots(),
             builder: (context, snapshot) {
               Message? message;
               if (snapshot.hasData && snapshot.data!.data() != null) {
@@ -109,7 +106,7 @@ class Profile extends StatelessWidget {
                           onTap: () async {
                             ImagePicker imagePicker = ImagePicker();
                             XFile? file = await imagePicker.pickImage(
-                                source: ImageSource.camera);
+                                source: ImageSource.gallery);
                             if (file == null) return;
                             //Import dart:core
                             String uniqueFileName = DateTime.now()
